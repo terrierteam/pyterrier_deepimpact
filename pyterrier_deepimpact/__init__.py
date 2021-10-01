@@ -2,6 +2,7 @@ import tempfile
 import pickle
 import itertools
 import math
+from more_itertools import chunked
 
 import torch
 import deepimpact
@@ -11,12 +12,14 @@ from deepimpact.model import MultiBERT as DeepImpactModel
 from deepimpact.utils import load_checkpoint
 from deepimpact.utils2 import cleanD
 
+import pyterrier as pt
 from pyterrier.index import IterDictIndexer
 
 class DeepImpactIndexer(IterDictIndexer):
 
     def __init__(self, 
                  *args,
+                 batch_size=1,
                  quantization_bits=8,
                  checkpoint='colbert-test-150000.dnn', 
                  base_model='bert-base-uncased',
@@ -29,6 +32,7 @@ class DeepImpactIndexer(IterDictIndexer):
         load_checkpoint(checkpoint, self.model)
         self.model.eval()      
         self.quantization_bits=quantization_bits
+        self.batch_size=batch_size
 
     def index(self, doc_iter, *args, **kwargs):
         
@@ -51,24 +55,29 @@ class DeepImpactIndexer(IterDictIndexer):
             max_impact = 0.0
             with tempfile.NamedTemporaryFile() as tmp:
                 from operator import itemgetter
-                for doc in pt.tqdm(doc_iter, desc='Computing the maximum score value and the impacts'):
-                    D = [tok(doc['text'])]
-                    transformed_doc = self.model.index(D, len(D[-1][0])+2)[0]
-                    max_impact = max(max_impact, max(transformed_doc, key=itemgetter(1))[1]) 
-                    pickle.dump({'docno': doc['docno'], 'text': transformed_doc}, tmp)
+
+                for batch in pt.tqdm(chunked(doc_iter, self.batch_size), desc='Computing the maximum score value and the impacts'):
+
+                    batch = [(doc['docno'], tok(doc['text'])) for doc in batch]
+                    batch = sorted(batch, key=lambda x: len(x[1][0]))
+                    docnos, D = zip(*batch)
+                    transformed_docs = self.model.index(D, 2 + len(D[-1][0]))
+                    for docno, doc in zip(docnos, transformed_docs):
+                        max_impact = max(max_impact, max(doc, key=itemgetter(1))[1])
+                        pickle.dump({'docno': docno, 'text': doc}, tmp)
 
                 print('Max impact is', max_impact)
                 scale = (1 << self.quantization_bits)/max_impact
 
-                def quantize(transformed_doc, max_impact):
+                def quantize(transformed_doc):
                     transformed_doc = [[term] * int(math.ceil(value * scale)) for term, value in transformed_doc]
                     return ' '.join(itertools.chain.from_iterable(transformed_doc))
 
                 tmp.seek(0)
                 while tmp.peek(1):
-                    transformed_doc = pickle.load(tmp)
-                    quantized_transformed_doc = quantize(transformed_doc['text'], max_impact)
-                    yield {'docno': transformed_doc['docno'], 'text': quantized_transformed_doc}
+                    doc = pickle.load(tmp)
+                    q_text = quantize(doc['text'])
+                    yield {'docno': doc['docno'], 'text': q_text}
 
         doc_iter = _deepimpact_iter(doc_iter)
         super().index(doc_iter, *args, **kwargs)
