@@ -3,7 +3,6 @@ pt.init()
 
 from pyterrier_deepimpact import DeepImpactIndexer
 
-
 indexer = DeepImpactIndexer('./di_index1', batch_size=32)
 indexer.index(pt.get_dataset("vaswani").get_corpus_iter())
 
