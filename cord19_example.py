@@ -43,7 +43,7 @@ df = pt.Experiment([
     ],
     cord19.get_topics(variant='description'),
     cord19.get_qrels(),
-    names=['bm25', "deep_impact"],
+    names=['BM25 (unstemmed)', "Deep Impact"],
     eval_metrics=["map", "recip_rank", "ndcg_cut_10"]
 )
 
