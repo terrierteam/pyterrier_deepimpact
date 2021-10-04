@@ -1,20 +1,27 @@
 import pyterrier as pt
 pt.init()
 
+import os
 from pyterrier_deepimpact import DeepImpactIndexer
 
-indexer = DeepImpactIndexer('./di_index1', batch_size=32)
-indexer.index(pt.get_dataset("vaswani").get_corpus_iter())
+vaswani = pt.datasets.get_dataset("vaswani")
 
-index_di = pt.IndexFactory.of('./di_index1')
+pt_index_path = './terrier_di_vaswani'
+if not os.path.exists(pt_index_path + "/data.properties"):
+    indexer = DeepImpactIndexer(pt_index_path, batch_size=32)
+    indexer.index(vaswani.get_corpus_iter())
+
+index_ref = pt.IndexRef.of(pt_index_path + "/data.properties")
+
+index_di = pt.IndexFactory.of(index_ref)
 index = pt.get_dataset("vaswani").get_index()
 
 df = pt.Experiment([
         pt.BatchRetrieve(index, wmodel="BM25"),
         pt.BatchRetrieve(index_di, wmodel="Tf")
     ],
-    pt.get_dataset("vaswani").get_topics(),
-    pt.get_dataset("vaswani").get_qrels(),
+    vaswani.get_topics(),
+    vaswani.get_qrels(),
     names=['bm25', "deep_impact"],
     eval_metrics=["map", "recip_rank", "ndcg_cut_10"]
 )

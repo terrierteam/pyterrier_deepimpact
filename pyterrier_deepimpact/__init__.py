@@ -24,6 +24,7 @@ class DeepImpactIndexer(IterDictIndexer):
                  checkpoint='colbert-test-150000.dnn', 
                  base_model='bert-base-uncased',
                  **kwargs):
+                 
         super().__init__(*args, **kwargs)
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')    
@@ -57,7 +58,6 @@ class DeepImpactIndexer(IterDictIndexer):
                 from operator import itemgetter
 
                 for batch in pt.tqdm(chunked(doc_iter, self.batch_size), desc='Computing the maximum score value and the impacts'):
-
                     batch = [(doc['docno'], tok(doc['text'])) for doc in batch]
                     batch = sorted(batch, key=lambda x: len(x[1][0]))
                     docnos, D = zip(*batch)
@@ -66,18 +66,21 @@ class DeepImpactIndexer(IterDictIndexer):
                         max_impact = max(max_impact, max(doc, key=itemgetter(1))[1])
                         pickle.dump({'docno': docno, 'text': doc}, tmp)
 
-                print('Max impact is', max_impact)
+                # print('Max impact is', max_impact)
                 scale = (1 << self.quantization_bits)/max_impact
 
                 def quantize(transformed_doc):
                     transformed_doc = [[term] * int(math.ceil(value * scale)) for term, value in transformed_doc]
                     return ' '.join(itertools.chain.from_iterable(transformed_doc))
 
+                encountered_docnos = set() # required to remove duplicates in cord19-like datasets :-(
                 tmp.seek(0)
                 while tmp.peek(1):
                     doc = pickle.load(tmp)
-                    q_text = quantize(doc['text'])
-                    yield {'docno': doc['docno'], 'text': q_text}
+                    if doc['docno'] not in encountered_docnos:
+                        q_text = quantize(doc['text'])
+                        yield {'docno': doc['docno'], 'text': q_text}
+                        encountered_docnos.add(doc['docno'])
 
         doc_iter = _deepimpact_iter(doc_iter)
         super().index(doc_iter, *args, **kwargs)
