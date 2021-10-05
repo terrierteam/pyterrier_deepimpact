@@ -55,7 +55,7 @@ class DeepImpactIndexer(IterDictIndexerBase):
         self.batch_size=batch_size
         if not gpu:
             import deepimpact.parameters, torch
-            deepimpact.model = deepimpact.parameters.DEVICE = torch.device("cpu")
+            deepimpact.model.DEVICE = deepimpact.parameters.DEVICE = torch.device("cpu")
 
     def index(self, doc_iter, *args, **kwargs):
         
