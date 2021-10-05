@@ -8,8 +8,9 @@ vaswani = pt.get_dataset("vaswani")
 
 pt_index_path = './terrier_di_vaswani'
 if not os.path.exists(pt_index_path + "/data.properties"):
-    indexer = DeepImpactIndexer(pt_index_path, batch_size=32)
-    indexer.setProperty("termpipelines", "")
+    parent = pt.index.IterDictIndexer(pt_index_path)
+    parent.setProperty("termpipelines", "")
+    indexer = DeepImpactIndexer(parent, batch_size=32)
     indexer.index(vaswani.get_corpus_iter())
 
 index_ref = pt.IndexRef.of(pt_index_path + "/data.properties")

@@ -43,4 +43,4 @@ jobs:
       env:
         TERRIER_VERSION: ${{ matrix.terrier }}
       run: |
-        pytest -s
+        pytest -s -p no:faulthandler

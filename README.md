@@ -14,7 +14,7 @@ You will also need a fine-tuned checkpoint (unzipped) for the DeepImpact model f
 
 ## What does it do?
 
-A `DeepImpactIndexer`is a PyTerrier indexer. When created, such indexer requires the following specific parameters:
+A `DeepImpactIndexer` can wrap PyTerrier indexers such as `pt.IterDictIndexer`. `DeepImpactIndexer` requires the following specific parameters:
 
 * `batch_size` (default 1): the number of documents to process in a single forward pass.
 * `quantization_bits` (default 8): the number of bits to use for impact scores quantisation.
@@ -26,8 +26,9 @@ Once created, the indexer can be used by calling the `index(doc_iter)` method, p
 ```python
 vaswani = pt.datasets.get_dataset("vaswani")
 
-indexer = DeepImpactIndexer('./terrier_di_vaswani', batch_size=32)
-indexer.setProperty("termpipelines", "")
+parent = pt.IterDictIndexer(os.path.join(self.test_dir, "index"))
+parent.setProperty("termpipelines", "")
+indexer = DeepImpactIndexer(parent, batch_size=32)
 indexer.index(vaswani.get_corpus_iter())
 ```
 

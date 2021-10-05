@@ -20,8 +20,9 @@ cord19 = pt.datasets.get_dataset('irds:cord19/trec-covid')
 
 pt_index_path = './terrier_di_cord19'
 if not os.path.exists(pt_index_path + "/data.properties"):
-    indexer = DeepImpactIndexer(pt_index_path, batch_size=32)
-    indexer.setProperty("termpipelines", "")
+    parent = pt.index.IterDictIndexer(pt_index_path)
+    parent.setProperty("termpipelines", "")
+    indexer = DeepImpactIndexer(parent, batch_size=32)
     indexer.index(text_iter(cord19.get_corpus_iter()))
 
 index_ref = pt.IndexRef.of(pt_index_path + "/data.properties")
