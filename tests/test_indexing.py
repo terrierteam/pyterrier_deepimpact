@@ -10,7 +10,7 @@ class TestIndexing(unittest.TestCase):
         import os
         os.rmdir(self.test_dir)
 
-        parent = pt.IterDictIndexer(os.path.join(self.test_dir, "index"))
+        parent = pt.index._IterDictIndexer_nofifo(os.path.join(self.test_dir, "index"))
         parent.setProperty("termpipelines", "")
         indexer = DeepImpactIndexer(parent, batch_size=2)
         iter = pt.get_dataset("vaswani").get_corpus_iter()
