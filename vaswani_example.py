@@ -2,7 +2,7 @@ import pyterrier as pt
 pt.init()
 
 import os
-from pyterrier_deepimpact import DeepImpactIndexer
+from pyt_deepimpact import DeepImpactIndexer
 
 vaswani = pt.get_dataset("vaswani")
 

@@ -6,7 +6,7 @@ class TestIndexing(unittest.TestCase):
 
     def test_indexing_1doc_torch(self):
         import pyterrier as pt
-        from pyterrier_deepimpact import DeepImpactIndexer
+        from pyt_deepimpact import DeepImpactIndexer
         import os
         os.rmdir(self.test_dir)
 
