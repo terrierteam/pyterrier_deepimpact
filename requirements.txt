@@ -1,4 +1,4 @@
-igdown
+gdown
 python-terrier
 pandas==1.3.3
 tokenizers==0.9.4
