@@ -14,9 +14,7 @@ class TestIndexing(unittest.TestCase):
         parent.setProperty("termpipelines", "")
         indexer = DeepImpactIndexer(parent, batch_size=2, gpu=False)
         iter = pt.get_dataset("vaswani").get_corpus_iter()
-        indexer.index([ next(iter) for i in range(200) ])
-
-        index_ref = pt.IndexRef.of(indexer.index_dir + "/data.properties")
+        index_ref = indexer.index([ next(iter) for i in range(200) ])
         index = pt.IndexFactory.of(index_ref)
 
         self.assertIsNotNone(index)
