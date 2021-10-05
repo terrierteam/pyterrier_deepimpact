@@ -12,7 +12,7 @@ class TestIndexing(unittest.TestCase):
 
         parent = pt.index._IterDictIndexer_nofifo(os.path.join(self.test_dir, "index"))
         parent.setProperty("termpipelines", "")
-        indexer = DeepImpactIndexer(parent, batch_size=2)
+        indexer = DeepImpactIndexer(parent, batch_size=2, gpu=False)
         iter = pt.get_dataset("vaswani").get_corpus_iter()
         indexer.index([ next(iter) for i in range(200) ])
 

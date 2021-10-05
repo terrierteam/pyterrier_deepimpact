@@ -45,6 +45,7 @@ class DeepImpactIndexer(IterDictIndexerBase):
                  quantization_bits=8,
                  checkpoint_gdrive_id='17I2TWCB2hBSQ-E0Yt2sBEDH2z_rV0BN0',
                  base_model='bert-base-uncased',
+                 gpu=True,
                  **kwargs):
                  
         super().__init__(*args, **kwargs)
@@ -52,6 +53,9 @@ class DeepImpactIndexer(IterDictIndexerBase):
         self.model = _load_model(checkpoint_gdrive_id, base_model)
         self.quantization_bits=quantization_bits
         self.batch_size=batch_size
+        if not gpu:
+            import deepimpact.parameters, torch
+            deepimpact.parameters.DEVICE = torch.device("cpu")
 
     def index(self, doc_iter, *args, **kwargs):
         
