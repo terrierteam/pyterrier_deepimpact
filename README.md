@@ -51,7 +51,7 @@ df = pt.Experiment(
 ```
 
 ## Examples
-Checkout our script:
+Checkout our scripts:
 
 * Vaswani [[Github]](https://github.com/tonellotto/pyterrier_di/blob/master/vaswani_example.py)
 * TREC CORD 19 [[Github]](https://github.com/tonellotto/pyterrier_di/blob/master/cord19_example.py)
