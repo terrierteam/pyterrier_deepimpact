@@ -38,8 +38,8 @@ index = pt.IndexFactory.of(index_ref)
 
 
 df = pt.Experiment([
-        pt.BatchRetrieve(index, wmodel="BM25", properties={"termpipelines" : ""}),
-        pt.BatchRetrieve(index_di, wmodel="Tf", properties={"termpipelines" : ""})
+        pt.BatchRetrieve(index, wmodel="BM25"),
+        pt.BatchRetrieve(index_di, wmodel="Tf")
     ],
     cord19.get_topics(variant='description'),
     cord19.get_qrels(),

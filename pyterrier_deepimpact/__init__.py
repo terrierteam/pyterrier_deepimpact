@@ -1,3 +1,4 @@
+import os
 import tempfile
 import pickle
 import itertools
@@ -9,11 +10,31 @@ import deepimpact
 import deepimpact.model
 
 from deepimpact.model import MultiBERT as DeepImpactModel
-from deepimpact.utils import load_checkpoint
 from deepimpact.utils2 import cleanD
 
 import pyterrier as pt
 from pyterrier.index import IterDictIndexer
+
+def _load_model(checkpoint_gdrive_id, base_model):
+
+    from deepimpact.utils import load_checkpoint
+
+    checkpoint_path='https://drive.google.com/uc?id=' + checkpoint_gdrive_id
+    print("Downloading checkpoint %s" % checkpoint_path)
+    import tempfile, gdown
+    targetFile = os.path.join(tempfile.mkdtemp(), 'checkpoint.dnn')
+    gdown.download(checkpoint_path, targetFile, quiet=False)
+    checkpoint_path = targetFile
+
+    print("Loading checkpoint %s" % checkpoint_path)
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')    
+    model = DeepImpactModel.from_pretrained(base_model)
+    model.to(device)
+    load_checkpoint(checkpoint_path, model)
+    model.eval()      
+
+    return model
+
 
 class DeepImpactIndexer(IterDictIndexer):
 
@@ -21,17 +42,13 @@ class DeepImpactIndexer(IterDictIndexer):
                  *args,
                  batch_size=1,
                  quantization_bits=8,
-                 checkpoint='colbert-test-150000.dnn', 
+                 checkpoint_gdrive_id='17I2TWCB2hBSQ-E0Yt2sBEDH2z_rV0BN0',
                  base_model='bert-base-uncased',
                  **kwargs):
                  
         super().__init__(*args, **kwargs)
 
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')    
-        self.model = DeepImpactModel.from_pretrained(base_model)
-        self.model.to(device)
-        load_checkpoint(checkpoint, self.model)
-        self.model.eval()      
+        self.model = _load_model(checkpoint_gdrive_id, base_model)
         self.quantization_bits=quantization_bits
         self.batch_size=batch_size
 

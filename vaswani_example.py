@@ -4,7 +4,7 @@ pt.init()
 import os
 from pyterrier_deepimpact import DeepImpactIndexer
 
-vaswani = pt.datasets.get_dataset("vaswani")
+vaswani = pt.get_dataset("vaswani")
 
 pt_index_path = './terrier_di_vaswani'
 if not os.path.exists(pt_index_path + "/data.properties"):
@@ -26,8 +26,10 @@ index_ref = pt.IndexRef.of(pt_index_path + "/data.properties")
 index = pt.IndexFactory.of(index_ref)
 
 df = pt.Experiment([
-        pt.BatchRetrieve(index, wmodel="BM25", properties={"termpipelines" : ""}),
-        pt.BatchRetrieve(index_di, wmodel="Tf", properties={"termpipelines" : ""})
+        #pt.BatchRetrieve(index, wmodel="BM25", properties={"termpipelines" : ""}),
+        #pt.BatchRetrieve(index_di, wmodel="Tf", properties={"termpipelines" : ""})
+        pt.BatchRetrieve(index, wmodel="BM25"),
+        pt.BatchRetrieve(index_di, wmodel="Tf")
     ],
     vaswani.get_topics(),
     vaswani.get_qrels(),

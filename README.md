@@ -34,7 +34,7 @@ indexer.index(vaswani.get_corpus_iter())
 It is important to disable stemming and stopword removal from indexing and retrieval, since the DeepImpact model has been trained without stemming, and with stopwords in place.
 
 At retrieval time, no special stuff is required. We can load the inverted index with basic PyTerrier transformers, but remember to:
-* disable term pipelines, e.g., `properties={"termpipelines" : ""}`;
+* disable term pipelines, e.g., `properties={"termpipelines" : ""}` (since Terrier 5.6 you don't need to set the properties for `termpipelines` - this is loaded based on what was set at indexing time);
 * use sum as weighting model, since we will sum up quantised impacts, e.g., `wmodel="Tf"`.
 
 ```python
@@ -42,7 +42,7 @@ index_ref = pt.IndexRef.of('./terrier_di_vaswani' + "/data.properties")
 index_di = pt.IndexFactory.of(index_ref)
 
 df = pt.Experiment(
-    [pt.BatchRetrieve(index_di, wmodel="Tf", properties={"termpipelines" : ""})],
+    [pt.BatchRetrieve(index_di, wmodel="Tf")],
     vaswani.get_topics(),
     vaswani.get_qrels(),
     names=["deep_impact"],
