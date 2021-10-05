@@ -35,10 +35,11 @@ def _load_model(checkpoint_gdrive_id, base_model):
 
     return model
 
-
-class DeepImpactIndexer(IterDictIndexer):
+from pyterrier.index import IterDictIndexerBase
+class DeepImpactIndexer(IterDictIndexerBase):
 
     def __init__(self, 
+                parent_indexer : IterDictIndexerBase,
                  *args,
                  batch_size=1,
                  quantization_bits=8,
@@ -47,7 +48,7 @@ class DeepImpactIndexer(IterDictIndexer):
                  **kwargs):
                  
         super().__init__(*args, **kwargs)
-
+        self.parent = parent_indexer
         self.model = _load_model(checkpoint_gdrive_id, base_model)
         self.quantization_bits=quantization_bits
         self.batch_size=batch_size
@@ -100,4 +101,4 @@ class DeepImpactIndexer(IterDictIndexer):
                         encountered_docnos.add(doc['docno'])
 
         doc_iter = _deepimpact_iter(doc_iter)
-        super().index(doc_iter, *args, **kwargs)
+        return self.parent.index(doc_iter, *args, **kwargs)
