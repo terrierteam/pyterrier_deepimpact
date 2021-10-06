@@ -1,6 +1,6 @@
 # PyTerrier - DeepImpact Plugin
 
-This is the [PyTerrier](https://github.com/terrier-org/pyterrier) plugin for the [DeepImpact](https://github.com/DI4IR/SIGIR2021) approach for sparse retrieval learning [Mallia20].
+This is the [PyTerrier](https://github.com/terrier-org/pyterrier) plugin for the [DeepImpact](https://github.com/DI4IR/SIGIR2021) approach for sparse retrieval learning [Mallia21].
 
 ## Installation
 
@@ -18,7 +18,7 @@ A `DeepImpactIndexer` can wrap PyTerrier indexers such as `pt.IterDictIndexer`. 
 
 * `batch_size` (default 1): the number of documents to process in a single forward pass.
 * `quantization_bits` (default 8): the number of bits to use for impact scores quantisation.
-* `checkpoint` (default `'colbert-test-150000.dnn'`): the fine-tuned DeepImpact checkpoint to use.
+* `checkpoint` (default: URL of trained model from [Mallia21]): the fine-tuned DeepImpact checkpoint to use. Can be file path, URL, or Google Drive URL.
 * `base_model` (default `'bert-base-uncased'`): the base model to use with the fine-tuned checkpoint.
 
 Once created, the indexer can be used by calling the `index(doc_iter)` method, passing a document iterator obect `doc_iter`.
@@ -59,7 +59,7 @@ Checkout our scripts:
 
 ## References
 
-[Mallia20] A. Mallia, O. Khattab, T. Suel, N. Tonellotto. *Learning Passage Impacts for Inverted Indexes*, ACM SIGIR 2021 [[link]](https://arxiv.org/abs/2104.12016)
+[Mallia21] A. Mallia, O. Khattab, T. Suel, N. Tonellotto. *Learning Passage Impacts for Inverted Indexes*, ACM SIGIR 2021 [[link]](https://arxiv.org/abs/2104.12016)
 
 ## Credits
 

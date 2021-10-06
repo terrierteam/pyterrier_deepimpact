@@ -3,6 +3,8 @@ import tempfile
 import pickle
 import itertools
 import math
+from pathlib import Path
+from hashlib import md5
 from more_itertools import chunked
 
 import torch
@@ -15,23 +17,40 @@ from deepimpact.utils2 import cleanD
 import pyterrier as pt
 from pyterrier.index import IterDictIndexer
 
-def _load_model(checkpoint_gdrive_id, base_model):
-
+def _load_model(path_or_url, base_model, gpu):
     from deepimpact.utils import load_checkpoint
+    if path_or_url.startswith('http://') or path_or_url.startswith('https://'):
+        cache_path = Path.home() / '.pyterrier' / 'pyt_deepimpact' / md5(path_or_url.encode()).hexdigest()
+        if cache_path.exists():
+            print("Using cached checkpoint at %s" % cache_path)
+            path_or_url = str(cache_path)
+        else:
+            if not cache_path.parent.exists():
+                cache_path.parent.mkdir(parents=True, exist_ok=True)
+            if path_or_url.startswith('https://drive.google.com'):
+                import gdown
+                print("Downloading from Google drive %s" % path_or_url)
+                gdown.download(path_or_url, str(cache_path), quiet=False)
+            else:
+                import requests, shutil
+                print("Downloading %s" % path_or_url)
+                try:
+                    with requests.get(path_or_url, stream=True) as r, \
+                         open(cache_path, 'wb') as f:
+                        shutil.copyfileobj(r.raw, f)
+                    path_or_url = str(cache_path)
+                except:
+                    if cache_path.exists():
+                        cache_path.unlink()
+                    raise
+            path_or_url = str(cache_path)
 
-    checkpoint_path='https://drive.google.com/uc?id=' + checkpoint_gdrive_id
-    print("Downloading checkpoint %s" % checkpoint_path)
-    import tempfile, gdown
-    targetFile = os.path.join(tempfile.mkdtemp(), 'checkpoint.dnn')
-    gdown.download(checkpoint_path, targetFile, quiet=False)
-    checkpoint_path = targetFile
-
-    print("Loading checkpoint %s" % checkpoint_path)
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')    
+    print("Loading checkpoint %s" % path_or_url)
+    device = torch.device('cuda' if gpu and torch.cuda.is_available() else 'cpu')
     model = DeepImpactModel.from_pretrained(base_model)
     model.to(device)
-    load_checkpoint(checkpoint_path, model)
-    model.eval()      
+    load_checkpoint(path_or_url, model)
+    model.eval()
 
     return model
 
@@ -43,14 +62,13 @@ class DeepImpactIndexer(IterDictIndexerBase):
                  *args,
                  batch_size=1,
                  quantization_bits=8,
-                 checkpoint_gdrive_id='17I2TWCB2hBSQ-E0Yt2sBEDH2z_rV0BN0',
+                 checkpoint='https://drive.google.com/uc?id=17I2TWCB2hBSQ-E0Yt2sBEDH2z_rV0BN0',
                  base_model='bert-base-uncased',
                  gpu=True,
                  **kwargs):
-                 
         super().__init__(*args, **kwargs)
         self.parent = parent_indexer
-        self.model = _load_model(checkpoint_gdrive_id, base_model)
+        self.model = _load_model(checkpoint, base_model, gpu)
         self.quantization_bits=quantization_bits
         self.batch_size=batch_size
         if not gpu:
