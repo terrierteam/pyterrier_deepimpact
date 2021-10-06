@@ -63,5 +63,6 @@ Checkout our scripts:
 
 ## Credits
 
-* Nicola Tonellotto, University of Pisa
 * Sean Macavaney, University of Glasgow
+* Craig Macdonald, University of Glasgow
+* Nicola Tonellotto, University of Pisa
