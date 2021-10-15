@@ -7,7 +7,7 @@ This is the [PyTerrier](https://github.com/terrier-org/pyterrier) plugin for the
 This repository can be installed using `pip`:
 
 ```shell
-pip install --upgrade git+https://github.com/tonellotto/pyterrier_di.git
+pip install --upgrade git+https://github.com/terrierteam/pyterrier_deepimpact.git
 ```
 
 You will also need a fine-tuned checkpoint (unzipped) for the DeepImpact model from [here](https://drive.google.com/file/d/17I2TWCB2hBSQ-E0Yt2sBEDH2z_rV0BN0/view?usp=sharing).
