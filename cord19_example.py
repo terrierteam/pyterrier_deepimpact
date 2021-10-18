@@ -2,7 +2,7 @@ import pyterrier as pt
 pt.init()
 
 import os
-from pyterrier_deepimpact import DeepImpactIndexer
+from pyt_deepimpact import DeepImpactIndexer
 
 def text_iter(doc_iter):
     encountered_docnos = set() # required to remove duplicates in cord19-like datasets :-(
