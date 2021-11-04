@@ -15,7 +15,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="pyterrier-di",
+    name="pyt-deepimpact",
     version="0.0.1",
     author="Nicola Tonellotto",
     author_email='nicola.tonellotto{at}unipi.it',
