@@ -62,7 +62,7 @@ class DeepImpactIndexer(IterDictIndexerBase):
                  *args,
                  batch_size=1,
                  quantization_bits=8,
-                 checkpoint='https://drive.google.com/uc?id=17I2TWCB2hBSQ-E0Yt2sBEDH2z_rV0BN0',
+                 checkpoint='https://drive.google.com/uc?id=1i4m5COAukLsGf4sQfEbxD-SC3LrP12Fr',
                  base_model='bert-base-uncased',
                  gpu=True,
                  **kwargs):
